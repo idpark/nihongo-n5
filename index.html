@@ -1068,7 +1068,10 @@ function openGrammarDetail(grammarId) {
       const answer = container.dataset.answer;
       const isCorrect = btn.dataset.val === answer;
       btn.classList.add(isCorrect ? "correct" : "wrong");
-      if (!isCorrect) {
+      if (isCorrect) {
+        confetti();
+        showToast("정답! 🎉", "success");
+      } else {
         container.querySelectorAll(".gd-choice").forEach(b => {
           if (b.dataset.val === answer) b.classList.add("correct");
         });
