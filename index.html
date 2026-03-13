@@ -1043,7 +1043,6 @@ function openGrammarDetail(grammarId) {
     ${g.practice.length > 0 ? `<div class="gd-section">
       <div class="gd-section-title">연습</div>
       ${g.practice.map((p, i) => {
-        // Build choices: correct answer + distractors from other grammar points
         const allAnswers = [...new Set(GRAMMAR_N5.flatMap(gg => gg.practice.map(pp => pp.answer)))];
         const distractors = allAnswers.filter(a => a !== p.answer);
         shuffleArray(distractors);
@@ -1053,18 +1052,29 @@ function openGrammarDetail(grammarId) {
         <div class="gd-practice" data-pidx="${i}">
           <div class="gd-practice-q">${escapeHTML(p.q)}</div>
           <div class="gd-hint" style="font-size:.75rem;color:var(--muted);margin-bottom:4px">💡 ${escapeHTML(p.hint || "")}</div>
-          <div class="gd-choices">
-            ${choices.map(c => `<button class="gd-choice" data-val="${escapeHTML(c)}" data-answer="${escapeHTML(p.answer)}" onclick="
-              if(this.parentElement.dataset.answered) return;
-              this.parentElement.dataset.answered='1';
-              const correct=this.dataset.val===this.dataset.answer;
-              this.classList.add(correct?'correct':'wrong');
-              if(!correct) this.parentElement.querySelector('[data-val=\x22'+this.dataset.answer+'\x22]').classList.add('correct');
-            ">${escapeHTML(c)}</button>`).join("")}
+          <div class="gd-choices" data-answer="${escapeHTML(p.answer)}">
+            ${choices.map(c => `<button class="gd-choice" data-val="${escapeHTML(c)}">${escapeHTML(c)}</button>`).join("")}
           </div>
         </div>`;
       }).join("")}
     </div>` : ""}`;
+
+  // Grammar practice choice handler (event delegation)
+  document.querySelectorAll(".gd-choices").forEach(container => {
+    container.addEventListener("click", (e) => {
+      const btn = e.target.closest(".gd-choice");
+      if (!btn || container.dataset.answered) return;
+      container.dataset.answered = "1";
+      const answer = container.dataset.answer;
+      const isCorrect = btn.dataset.val === answer;
+      btn.classList.add(isCorrect ? "correct" : "wrong");
+      if (!isCorrect) {
+        container.querySelectorAll(".gd-choice").forEach(b => {
+          if (b.dataset.val === answer) b.classList.add("correct");
+        });
+      }
+    });
+  });
 
   addXP(5);
   renderHeader();
