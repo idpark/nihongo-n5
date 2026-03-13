@@ -176,6 +176,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Hiragino Sans',san
 .gd-example-kr{font-size:.78rem;color:var(--muted)}
 .gd-practice{margin-top:8px}
 .gd-practice-q{font-size:.9rem;margin-bottom:6px;line-height:1.4}
+.gd-choices{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.gd-choice{background:var(--card2);border:1.5px solid var(--border);border-radius:8px;padding:8px 14px;font-size:.88rem;cursor:pointer;transition:all .15s}
+.gd-choice:active{transform:scale(.95)}
+.gd-choice.correct{background:rgba(34,197,94,.15);border-color:var(--green);color:var(--green)}
+.gd-choice.wrong{background:rgba(239,68,68,.15);border-color:var(--red);color:var(--red)}
 
 /* AI Chat */
 .ai-scenario-list{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
@@ -1037,15 +1042,28 @@ function openGrammarDetail(grammarId) {
 
     ${g.practice.length > 0 ? `<div class="gd-section">
       <div class="gd-section-title">연습</div>
-      ${g.practice.map((p, i) => `
+      ${g.practice.map((p, i) => {
+        // Build choices: correct answer + distractors from other grammar points
+        const allAnswers = [...new Set(GRAMMAR_N5.flatMap(gg => gg.practice.map(pp => pp.answer)))];
+        const distractors = allAnswers.filter(a => a !== p.answer);
+        shuffleArray(distractors);
+        const choices = [p.answer, ...distractors.slice(0, 3)];
+        shuffleArray(choices);
+        return `
         <div class="gd-practice" data-pidx="${i}">
           <div class="gd-practice-q">${escapeHTML(p.q)}</div>
-          <div style="display:flex;gap:6px;margin-top:4px">
-            <input class="ex-input" placeholder="${escapeHTML(p.hint || "답을 입력하세요")}" data-answer="${escapeHTML(p.answer)}" style="flex:1;padding:8px">
-            <button class="ex-submit" style="padding:8px 12px" onclick="this.previousElementSibling.value===this.previousElementSibling.dataset.answer?(this.parentElement.style.borderLeft='3px solid var(--green)',this.parentElement.querySelector('input').style.color='var(--green)'):(this.parentElement.style.borderLeft='3px solid var(--red)',this.parentElement.querySelector('input').style.color='var(--red)')">확인</button>
+          <div class="gd-hint" style="font-size:.75rem;color:var(--muted);margin-bottom:4px">💡 ${escapeHTML(p.hint || "")}</div>
+          <div class="gd-choices">
+            ${choices.map(c => `<button class="gd-choice" data-val="${escapeHTML(c)}" data-answer="${escapeHTML(p.answer)}" onclick="
+              if(this.parentElement.dataset.answered) return;
+              this.parentElement.dataset.answered='1';
+              const correct=this.dataset.val===this.dataset.answer;
+              this.classList.add(correct?'correct':'wrong');
+              if(!correct) this.parentElement.querySelector('[data-val=\x22'+this.dataset.answer+'\x22]').classList.add('correct');
+            ">${escapeHTML(c)}</button>`).join("")}
           </div>
-        </div>
-      `).join("")}
+        </div>`;
+      }).join("")}
     </div>` : ""}`;
 
   addXP(5);
