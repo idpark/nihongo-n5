@@ -74,13 +74,13 @@ export function speakSequence(items, rate = 0.85, onAllDone) {
       u.lang = "ja-JP"; u.rate = rate; u.volume = 1;
       // Voice & pitch by gender
       if (item.gender === "male" && _ttsJaVoiceMale) {
-        u.voice = _ttsJaVoiceMale; u.pitch = 0.85;
+        u.voice = _ttsJaVoiceMale; u.pitch = 0.6;
       } else if (item.gender === "female" && _ttsJaVoiceFemale) {
-        u.voice = _ttsJaVoiceFemale; u.pitch = 1.15;
+        u.voice = _ttsJaVoiceFemale; u.pitch = 1.1;
       } else {
-        // Fallback: use default voice with pitch difference
+        // Fallback: use default voice (typically female on iOS) with pitch difference
         if (_ttsJaVoice) u.voice = _ttsJaVoice;
-        u.pitch = item.gender === "male" ? 0.75 : item.gender === "female" ? 1.2 : 1;
+        u.pitch = item.gender === "male" ? 0.5 : item.gender === "female" ? 1.1 : 1;
       }
       let keepAlive = null;
       u.onstart = () => {
