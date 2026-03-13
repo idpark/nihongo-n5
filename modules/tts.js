@@ -21,8 +21,8 @@ if (window.speechSynthesis) {
   speechSynthesis.addEventListener("voiceschanged", _loadTTSVoices);
 }
 
-export function speakJapanese(text, rate = 0.85) {
-  if (!window.speechSynthesis || !text) return;
+export function speakJapanese(text, rate = 0.85, onDone) {
+  if (!window.speechSynthesis || !text) { if (onDone) onDone(); return; }
   try {
     speechSynthesis.cancel();
     setTimeout(() => {
@@ -37,11 +37,11 @@ export function speakJapanese(text, rate = 0.85) {
           speechSynthesis.pause(); speechSynthesis.resume();
         }, 5000);
       };
-      u.onend = () => { if (keepAlive) clearInterval(keepAlive); };
-      u.onerror = () => { if (keepAlive) clearInterval(keepAlive); };
+      u.onend = () => { if (keepAlive) clearInterval(keepAlive); if (onDone) onDone(); };
+      u.onerror = () => { if (keepAlive) clearInterval(keepAlive); if (onDone) onDone(); };
       speechSynthesis.speak(u);
     }, 100);
-  } catch (e) { console.warn("TTS failed:", e); }
+  } catch (e) { console.warn("TTS failed:", e); if (onDone) onDone(); }
 }
 
 export function stopSpeaking() {

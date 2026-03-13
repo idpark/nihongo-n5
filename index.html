@@ -1311,12 +1311,15 @@ function bindEvents() {
     if (!currentChapter) return;
     const dlg = getDialogue(currentChapter);
     if (!dlg) return;
+    stopSpeaking();
     let i = 0;
     function playNext() {
       if (i >= dlg.lines.length) return;
-      speakJapanese(dlg.lines[i].reading || dlg.lines[i].jp, 0.8);
+      const text = dlg.lines[i].reading || dlg.lines[i].jp;
       i++;
-      setTimeout(playNext, 2000);
+      speakJapanese(text, 0.8, () => {
+        setTimeout(playNext, 400);
+      });
     }
     playNext();
   });
