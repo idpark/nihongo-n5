@@ -27,6 +27,24 @@ export async function callAI(messages, systemPrompt, maxTokens = 400) {
       if (!resp.ok) { const err = await resp.text(); throw new Error(err); }
       const data = await resp.json();
       return data.content[0].text;
+    } else if (provider === "gemini") {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${state.aiApiKey}`;
+      const contents = messages.map(m => ({
+        role: m.role === "assistant" ? "model" : "user",
+        parts: [{ text: m.content }]
+      }));
+      const resp = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          system_instruction: { parts: [{ text: systemPrompt }] },
+          contents,
+          generationConfig: { maxOutputTokens: maxTokens }
+        })
+      });
+      if (!resp.ok) { const err = await resp.text(); throw new Error(err); }
+      const data = await resp.json();
+      return data.candidates?.[0]?.content?.parts?.[0]?.text || "";
     } else {
       const resp = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
