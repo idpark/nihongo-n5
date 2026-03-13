@@ -1306,22 +1306,12 @@ function bindEvents() {
     }
   });
 
-  // Play all TTS — sequential with male/female voices
+  // Play all TTS — sequential playback
   $("playAll").addEventListener("click", () => {
     if (!currentChapter) return;
     const dlg = getDialogue(currentChapter);
     if (!dlg) return;
-    // Map first character → male, second → female
-    const speakerGender = {};
-    if (dlg.characters) {
-      dlg.characters.forEach((ch, idx) => {
-        speakerGender[ch.name] = idx === 0 ? "male" : "female";
-      });
-    }
-    const items = dlg.lines.map(line => ({
-      text: line.reading || line.jp,
-      gender: speakerGender[line.speaker] || undefined
-    }));
+    const items = dlg.lines.map(line => line.reading || line.jp);
     speakSequence(items, 0.8);
   });
 
