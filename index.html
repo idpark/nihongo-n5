@@ -584,7 +584,7 @@ ruby rt{font-size:.6em;color:var(--muted)}
 
 <script type="module">
 import { getState, saveState, updateState, addXP, xpForLevel, isChapterUnlocked, unlockChapter, getDueVocab, exportData, importData, recordActivity } from "./modules/state.js";
-import { speakJapanese, stopSpeaking } from "./modules/tts.js";
+import { speakJapanese, speakSequence, stopSpeaking } from "./modules/tts.js";
 import { shuffleArray, pickRandom, furiganaHTML, escapeHTML, debounce } from "./modules/utils.js";
 import { getDialogue, getVocabById, getGrammarById, getChapterVocab, getChapterGrammar, completeDialogue, saveExerciseScore, isDialogueCompleted, getDialogueScore } from "./modules/dialogue.js";
 import { generateQuiz, processAnswer } from "./modules/quiz.js";
@@ -1306,22 +1306,23 @@ function bindEvents() {
     }
   });
 
-  // Play all TTS
+  // Play all TTS — sequential with male/female voices
   $("playAll").addEventListener("click", () => {
     if (!currentChapter) return;
     const dlg = getDialogue(currentChapter);
     if (!dlg) return;
-    stopSpeaking();
-    let i = 0;
-    function playNext() {
-      if (i >= dlg.lines.length) return;
-      const text = dlg.lines[i].reading || dlg.lines[i].jp;
-      i++;
-      speakJapanese(text, 0.8, () => {
-        setTimeout(playNext, 400);
+    // Map first character → male, second → female
+    const speakerGender = {};
+    if (dlg.characters) {
+      dlg.characters.forEach((ch, idx) => {
+        speakerGender[ch.name] = idx === 0 ? "male" : "female";
       });
     }
-    playNext();
+    const items = dlg.lines.map(line => ({
+      text: line.reading || line.jp,
+      gender: speakerGender[line.speaker] || undefined
+    }));
+    speakSequence(items, 0.8);
   });
 
   // Exercise button
