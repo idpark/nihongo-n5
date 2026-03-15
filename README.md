@@ -22,3 +22,8 @@ https://idpark.github.io/nihongo-n5/ 에서 바로 사용하거나, 스마트폰
 - localStorage 상태 관리
 - Web Speech API (TTS)
 - GitHub Pages 배포
+
+## Contributors
+
+- [@idpark](https://github.com/idpark) — 기획, 개발
+- Claude Code (Anthropic) — AI 페어 프로그래밍
