@@ -1,4 +1,4 @@
-const CACHE_NAME = "n5-v13";
+const CACHE_NAME = "n5-v14";
 const STATIC_ASSETS = [
   "./index.html",
   "./manifest.json",
