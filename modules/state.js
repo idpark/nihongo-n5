@@ -167,7 +167,7 @@ export function unlockChapter(ch) {
 }
 
 export function isChapterUnlocked(ch) {
-  return state.unlockedChapters.includes(ch);
+  return true; // All chapters freely accessible
 }
 
 // ===================== VOCAB STATS =====================

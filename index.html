@@ -57,6 +57,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Hiragino Sans',san
 .ch-tag{font-size:.55rem;padding:2px 6px;border-radius:6px;font-weight:600}
 .ch-tag.daily{background:#1e3a5f;color:#60a5fa}
 .ch-tag.fairytale{background:#3b1f4e;color:#c084fc}
+.ch-tag.recommend{background:#164e1e;color:#4ade80;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
 .ch-tag.modern{background:#1a3a2a;color:#6ee7b7}
 .ch-score{font-size:.6rem;color:var(--gold)}
 .ch-arrow{color:var(--muted);font-size:.9rem}
@@ -647,18 +649,20 @@ function renderChapterList() {
     if (isCurrent && unlocked) cls += " current";
     const tagCls = ch.theme === "fairytale" ? "fairytale" : ch.theme === "modern" ? "modern" : "daily";
     const tagLabel = ch.theme === "fairytale" ? "동화" : ch.theme === "modern" ? "현대" : "일상";
+    const isNext = !completed && !CHAPTER_LIST.slice(0, CHAPTER_LIST.indexOf(ch)).some(c => !isDialogueCompleted(c.ch));
     return `<div class="${cls}" data-ch="${ch.ch}" style="background-image:linear-gradient(90deg,var(--card) 60%,transparent),url('images/chapters/${ch.ch}.png');background-size:cover,auto 100%;background-position:left,right center">
-      <div class="ch-icon">${unlocked ? ch.icon : "🔒"}</div>
+      <div class="ch-icon">${ch.icon}</div>
       <div class="ch-info">
         <div class="ch-num">Chapter ${ch.ch}</div>
         <div class="ch-title">${ch.title}</div>
         <div class="ch-title-kr">${ch.titleKr}</div>
         <div class="ch-badge">
           <span class="ch-tag ${tagCls}">${tagLabel}</span>
+          ${isNext ? `<span class="ch-tag recommend">추천</span>` : ""}
           ${score > 0 ? `<span class="ch-score">⭐ ${score}%</span>` : ""}
         </div>
       </div>
-      <div class="ch-arrow">${unlocked ? "→" : ""}</div>
+      <div class="ch-arrow">→</div>
     </div>`;
   }).join("");
 }
